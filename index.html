@@ -1,1 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silence — бесплатный VPN</title>
+  <style>
+    /* ----- Сброс и базовые стили ----- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
 
+    body {
+      background: #0b0f1a;
+      background: radial-gradient(circle at 20% 30%, #1a1f2e, #0a0c14);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1.5rem 2rem;
+      color: #eef2ff;
+    }
+
+    /* ----- Контейнер всего контента (мобильная адаптация) ----- */
+    .app {
+      max-width: 480px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.8rem;
+    }
+
+    /* ----- Блок с аватаром и бейджем (относительное позиционирование) ----- */
+    .avatar-section {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      width: 100%;
+    }
+
+    /* Круглое фото */
+    .avatar {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #2e3a5c;
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.25);
+      transition: border-color 0.2s;
+      background: #141a26;
+    }
+
+    .avatar:hover {
+      border-color: #3effb0;
+    }
+
+    /* Зелёный бейдж «Остаться на связи» — слева от аватара, плавно двигается вверх-вниз */
+    .badge {
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(145deg, #00c853, #00a344);
+      color: #0b0f1a;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.5rem 1rem 0.5rem 1.2rem;
+      border-radius: 40px 12px 12px 40px;
+      box-shadow: 0 6px 14px rgba(0, 200, 83, 0.5), 0 0 0 2px #1e2a3a inset;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      animation: floatBadge 3s ease-in-out infinite;
+      pointer-events: none;
+      border: 1px solid #6affb0;
+      z-index: 2;
+    }
+
+    /* Плавное покачивание вверх-вниз (медленное) */
+    @keyframes floatBadge {
+      0% {
+        transform: translateY(-50%) translateY(0px);
+      }
+      50% {
+        transform: translateY(-50%) translateY(-8px);
+      }
+      100% {
+        transform: translateY(-50%) translateY(0px);
+      }
+    }
+
+    /* ----- Карточки (рамки) ----- */
+    .card {
+      background: rgba(18, 24, 38, 0.8);
+         backdrop-filter: blur(8px);
+      border: 1.5px }
+
+ solid #2c3a58;
+      border-radius:    2rem;
+      padding: 1. .8rem 1.5rem;
+      width: 100btn%;
+      text-align: center;
+      box-shadow: 0 18px 30px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 255, 200, 0.1) inset;
+      transition: transform 0.15s, border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: #3b5380;
+    }
+
+    .card p {
+      font-size: 1.2rem;
+      line-height: 1.5;
+      margin-bottom: 1.4rem;
+      color: #d9e2ff;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    /* ----- Кнопки ----- */
+    .btn {
+      display: inline-block;
+      background: linear-gradient(145deg, #192f44, #0f1a2b);
+      border: 1.5px solid #2e6b5c;
+      color: #b6ffe0;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.9rem 1.8rem;
+      border-radius: 60px;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: all 0.2s;
+      box-shadow: 0 6px 0 #0b111c, 0 10px 20px -8px #00b87c;
+      cursor: pointer;
+      width: fit-content;
+      min-width: 200px;
+      margin: 0 auto;
+      text-align: center;
+:hover {
+      background: linear-gradient(145deg, #1f3d58, #142433);
+      border-color: #44e6b0;
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #0b111c, 0 18px 25px -10px #00e69c;
+    }
+
+    .btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #0b111c, 0 8px 15px -5px #00b87c;
+    }
+
+    /* Кнопка «Скопировать» — синяя вариация */
+    .btn-copy {
+      background: linear-gradient(145deg, #1e2f4a, #111d30);
+      border-color: #476bb3;
+      color: #b8d0ff;
+      box-shadow: 0 6px 0 #0a0f18, 0 10px 20px -8px #3b6eff;
+    }
+
+    .btn-copy:hover {
+      border-color: #6f9aff;
+      color: #ffffff;
+      box-shadow: 0 8px 0 #0a0f18, 0 18px 25px -10px #3b6eff;
+    }
+
+    /* Кнопка «Назад» (появляется после копирования) */
+    .btn-back {
+      background: linear-gradient(145deg, #2e2b3a, #1b1728);
+      border-color: #a48cd6;
+      color: #e2d4ff;
+      box-shadow: 0 6px 0 #110e1a, 0 10px 20px -8px #9f7aea;
+    }
+
+    .btn-back:hover {
+      border-color: #cbb2ff;
+      color: #ffffff;
+      box-shadow: 0 8px 0 #110e1a, 0 18px 25px -10px #b794f4;
+    }
+
+    /* ----- Блок с ссылками-подписями ----- */
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 0.8rem;
+      width: 100%;
+      padding: 0.6rem 0;
+    }
+
+    .footer-link {
+      color: #8fa4d4;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: color 0.2s, text-shadow 0.2s;
+      padding: 0.4rem 0.6rem;
+      border-radius: 30px;
+    }
+
+    .footer-link:hover {
+      color: #d6e4ff;
+      text-shadow: 0 0 12px #7aa2ff;
+    }
+
+    /* Надпись «Спасибо всем 🔥» */
+    .thanks {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 0.5rem 0 0.2rem;
+      color: #ffe28c;
+      text-shadow: 0 0 20px #ffb347, 0 0 40px #ff8c1a;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    /* Вспомогательный класс для скрытия */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Стили для плавного появления */
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Обёртка кнопок подписки — управление состоянием */
+    .sub-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .sub-actions .btn {
+      width: auto;
+      min-width: 210px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- 1. Аватар + бейдж -->
+    <div class="avatar-section">
+      <!-- Бейдж слева, плавно двигается вверх-вниз -->
+      <div class="badge">Остаться на связи</div>
+      <!-- Круглое фото (прямая ссылка из GitHub репозитория MK-l4/New-Site) -->
+      <img src="https://raw.githubusercontent.com/MK-l4/New-Site/main/IMG_3407.JPG" alt="Silence avatar" class="avatar">
+    </div>
+
+    <!-- 2. Первая рамка -->
+    <div class="card">
+      <p>Всем привет я Silence, добро пожаловать это мой сайт</p>
+      <a href="https://t.me/FREEVPN444" target="_blank" rel="noopener" class="btn">📡 Следить за новостями</a>
+    </div>
+
+    <!-- 3. Вторая рамка (с интерактивом: копировать / назад) -->
+    <div class="card" id="subscriptionCard">
+      <p>Наша бесплатная подписка</p>
+
+      <div class="sub-actions">
+        <!-- Кнопка «Получить подписку» (ведёт по ссылке) -->
+        <a href="https://pozor.bond/sub/14a7eabg7e4i" target="_blank" rel="noopener" class="btn" id="getSubBtn">
+          🎁 Получить подписку
+        </a>
+
+        <!-- Кнопка «Скопировать» — при клике копирует ссылку и показывает «Назад» -->
+        <button class="btn btn-copy" id="copyBtn">📋 Скопировать</button>
+
+        <!-- Кнопка «Назад» — изначально скрыта, появляется после копирования -->
+        <button class="btn btn-back hidden" id="backBtn">🔙 Назад</button>
+      </div>
+    </div>
+
+    <!-- 4. Надпись «Спасибо всем 🔥» + нижние ссылки -->
+    <div class="thanks">Спасибо всем 🔥</div>
+
+    <div class="footer-links">
+      <!-- Главная — переносит на аву (плавный скролл к аватару) -->
+      <a href="#" class="footer-link" id="homeLink">Главная</a>
+      <!-- Канал — ведёт в Telegram -->
+      <a href="https://t.me/FREEVPN444" target="_blank" rel="noopener" class="footer-link">Канал</a>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ========== 1. Плавный скролл к аватару при клике на "Главная" ==========
+      const homeLink = document.getElementById('homeLink');
+      if (homeLink) {
+        homeLink.addEventListener('click', function(e) {
+          e.preventDefault();  // отменяем стандартный переход по #
+          const avatarSection = document.querySelector('.avatar-section');
+          if (avatarSection) {
+            avatarSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      }
+
+      // ========== 2. Логика для кнопок "Скопировать" и "Назад" ==========
+      const copyBtn = document.getElementById('copyBtn');
+      const backBtn = document.getElementById('backBtn');
+      const getSubBtn = document.getElementById('getSubBtn'); // кнопка "Получить подписку"
+
+      // Ссылка для подписки
+      const SUBSCRIPTION_URL = 'https://pozor.bond/sub/14a7eabg7e4i';
+
+      // Функция копирования в буфер обмена (с fallback)
+      async function copyToClipboard(text) {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } else {
+            // fallback для http и старых браузеров
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            textArea.style.top = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            return successful;
+          }
+        } catch (err) {
+          console.error('Ошибка копирования: ', err);
+          return false;
+        }
+      }
+
+      // Обработчик кнопки "Скопировать"
+      copyBtn.addEventListener('click', async function() {
+        const success = await copyToClipboard(SUBSCRIPTION_URL);
+        
+        // Временная визуальная обратная связь (изменяем текст)
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = success ? '✅ Скопировано!' : '❌ Ошибка';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 1500);
+
+        if (success) {
+          // Показываем кнопку "Назад", скрываем "Скопировать" и "Получить подписку"
+          copyBtn.classList.add('hidden');
+          getSubBtn.classList.add('hidden');
+          backBtn.classList.remove('hidden');
+        } else {
+          // Если не удалось скопировать — просто оставляем всё как есть
+          alert('Не удалось скопировать ссылку. Попробуйте вручную.');
+        }
+      });
+
+      // Обработчик кнопки "Назад" — возвращает исходное состояние
+      backBtn.addEventListener('click', function() {
+        // Скрываем "Назад", показываем "Скопировать" и "Получить подписку"
+        backBtn.classList.add('hidden');
+        copyBtn.classList.remove('hidden');
+        getSubBtn.classList.remove('hidden');
+      });
+
+      // ========== 3. Страховка: если фото не загрузится, покажем круг с буквой "S" ==========
+      const avatarImg = document.querySelector('.avatar');
+      avatarImg.addEventListener('error', function() {
+        this.src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'130\' height=\'130\' viewBox=\'0 0 130 130\'%3E%3Ccircle cx=\'65\' cy=\'65\' r=\'65\' fill=\'%231e2a3a\'/%3E%3Ctext x=\'65\' y=\'85\' font-size=\'60\' font-weight=\'bold\' text-anchor=\'middle\' fill=\'%237aa2ff\' font-family=\'Arial\'%3ES%3C/text%3E%3C/svg%3E';
+      });
+    })();
+  </script>
+</body>
+</html>
